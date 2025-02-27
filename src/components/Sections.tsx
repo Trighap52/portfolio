@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
 import { FaLinkedin, FaGithub, FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import fullpage from "fullpage.js";
 import "fullpage.js/dist/fullpage.css"; // Import FullPage styles
+import { useEffect } from "react";
 
 const sections = [
   {
@@ -29,9 +29,6 @@ const sections = [
       </>
     ),
   },
-  {
-    id: "education",
-    title:""},
   {
     id: "rabat",
     title: "🌍 Rabat, Morocco ( - 2020)",
@@ -141,10 +138,7 @@ const sections = [
       </div>
     ),
   },
-  {
-    id: "experience",
-    title: "",
-  },
+
   {
     id: "edf",
     title: "⚡️ EDF - Software Engineer Intern (2024 - 2025)",
@@ -159,7 +153,10 @@ const sections = [
         </div>
         <h3 className="text-xl font-bold">Software Engineer Intern</h3>
         <p className="mt-2 text-lg">
-          Working on <span className="font-bold">Big Data solutions</span>, optimizing <span className="font-bold">machine learning pipelines</span> and handling <span className="font-bold">data engineering tasks</span>.
+          Working on <span className="font-bold">Big Data solutions</span>,
+          optimizing{" "}
+          <span className="font-bold">machine learning pipelines</span> and
+          handling <span className="font-bold">data engineering tasks</span>.
         </p>
       </div>
     ),
@@ -178,7 +175,9 @@ const sections = [
         </div>
         <h3 className="text-xl font-bold">Frontend Developer</h3>
         <p className="mt-2 text-lg">
-          Developed <span className="font-bold">React & UI/UX components</span>, collaborating with <span className="font-bold">design teams</span> to improve <span className="font-bold">user experience</span>.
+          Developed <span className="font-bold">React & UI/UX components</span>,
+          collaborating with <span className="font-bold">design teams</span> to
+          improve <span className="font-bold">user experience</span>.
         </p>
       </div>
     ),
@@ -196,8 +195,11 @@ const sections = [
           />
         </div>
         <h3 className="text-xl font-bold">Data Trainee</h3>
-        <p className="mt-2 text-lg max-w-md text-justify"> 
-          Worked on <span className="font-bold">data analytics & Python automation</span>, optimizing <span className="font-bold">business insights</span> for the company.
+        <p className="mt-2 text-lg max-w-md text-justify">
+          Worked on{" "}
+          <span className="font-bold">data analytics & Python automation</span>,
+          optimizing <span className="font-bold">business insights</span> for
+          the company.
         </p>
       </div>
     ),
@@ -223,7 +225,6 @@ const sections = [
         </p>
         <a
           href="https://github.com/Trighap52"
-          target="_blank"
           className="mt-4 inline-block bg-gray-800 px-4 py-2 rounded text-white font-bold"
         >
           🔗 View My GitHub
@@ -236,10 +237,10 @@ const sections = [
     title: "📫 Connect with Me",
     content: (
       <div className="flex space-x-4 mt-4">
-        <a href="https://www.linkedin.com/in/zyad-haddad/" target="_blank">
+        <a href="https://www.linkedin.com/in/zyad-haddad/">
           <FaLinkedin className="text-blue-500 text-3xl" />
         </a>
-        <a href="https://github.com/zyad-haddad" target="_blank">
+        <a href="https://github.com/zyad-haddad">
           <FaGithub className="text-gray-500 text-3xl" />
         </a>
         <a href="mailto:trighap52@gmail.com">
@@ -253,21 +254,33 @@ const sections = [
   },
 ];
 
-const Sections = () => {
+const Sections = ({
+  onSectionChange,
+}: {
+  onSectionChange: (sectionIndex: number) => void;
+}) => {
   useEffect(() => {
     new fullpage("#fullpage", {
       autoScrolling: true,
       navigation: true,
       scrollingSpeed: 1000, // Smooth transition between pages
+      afterSlideLoad: (section: any, origin: any, destination: any) => {
+        onSectionChange(section.index); // 🔥 Notify parent component (ScrollGlobe
+        console.log("section", section.index);
+      },
+      afterLoad: function(origin : any, destination : any, direction : any, trigger: any){
+        onSectionChange(destination.index); // 🔥 Notify parent component (ScrollGlobe)
+        console.log("section", destination.index);
+      },
     });
-  }, []);
+  }, [onSectionChange]);
 
   return (
     <div id="fullpage">
       {sections.map(({ id, title, content }) => (
         <div
           key={id}
-          className="section"
+          className="section p-4"
           style={{ fontFamily: "Exo, sans-serif" }}
         >
           <h1 className="text-4xl font-bold mb-4">{title}</h1>
