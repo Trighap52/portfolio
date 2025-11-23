@@ -1,16 +1,44 @@
-"use client"
+"use client";
 
-import type { PortfolioSection } from "@/app/page"
-import { AnimatePresence, motion } from "framer-motion"
-import TechIcons from "@/components/tech-icons"
-import { ChevronDown } from "lucide-react"
+import type { PortfolioSection } from "@/app/page";
+import { AnimatePresence, motion } from "framer-motion";
+import TechIcons from "@/components/tech-icons";
+import { ChevronDown } from "lucide-react";
+import { PlayingCard } from "@/components/playing-card";
+import type { CardInfo } from "@/lib/cards";
+import { describeHand } from "@/lib/cards";
 
 interface HeroContentProps {
-  activeSection: PortfolioSection
-  direction?: "up" | "down" | null
+  activeSection: PortfolioSection;
+  direction?: "up" | "down" | null;
+  sectionCards: Partial<Record<PortfolioSection, CardInfo>>;
+  totalScore: number;
+  onReset: () => void;
+  cardSections: PortfolioSection[];
 }
 
-export default function HeroContent({ activeSection, direction }: HeroContentProps) {
+export default function HeroContent({
+  activeSection,
+  direction,
+  sectionCards,
+  totalScore,
+  onReset,
+  cardSections,
+}: HeroContentProps) {
+  const drawnCount = cardSections.filter((key) => sectionCards[key]).length;
+  const handName = describeHand(
+    cardSections.map((key) => sectionCards[key]).filter(Boolean) as CardInfo[]
+  );
+
+  const performanceText = (() => {
+    if (totalScore >= 40)
+      return "Royal engineer — stacked hand, stacked impact.";
+    if (totalScore >= 30)
+      return "Strong hand — consistent wins across the board.";
+    if (totalScore >= 20)
+      return "Solid draw — a few more cards and it’s a flush.";
+    return "Tough shuffle — reshuffle and push for a better draw.";
+  })();
   const renderContent = () => {
     switch (activeSection) {
       case "intro":
@@ -22,7 +50,12 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
               <span className="font-medium italic instrument">HADDAD</span>
             </h1>
             <p className="text-xs md:text-sm font-light text-white/70 mb-6 leading-relaxed max-w-xs md:max-w-md">
-              Hi, I’m Zyad Haddad, a CS engineer splitting a double M.Sc. between INSA Lyon and KTH. I love shipping AI-powered tools, resilient distributed systems, and playful web experiences that people actually use. If we’re not talking tech, I’m likely working on side-projects, contributing to open-source, or lost in a Balatro run.
+              Hi, I’m Zyad Haddad, a CS engineer splitting a double M.Sc.
+              between INSA Lyon and KTH. I love shipping AI-powered tools,
+              resilient distributed systems, and playful web experiences that
+              people actually use. If we’re not talking tech, I’m likely working
+              on side-projects, contributing to open-source, or lost in a
+              Balatro run.
             </p>
             <div className="flex items-center gap-2 md:gap-4 flex-wrap">
               <a
@@ -43,7 +76,7 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
               </a>
             </div>
           </>
-        )
+        );
 
       case "experience":
         return (
@@ -55,11 +88,23 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
               <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-sm md:text-lg font-medium text-white">AI Engineer Intern (Master Thesis)</h3>
+                    <h3 className="text-sm md:text-lg font-medium text-white">
+                      AI Engineer Intern (Master Thesis)
+                    </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">Volvo Group • Jun 2025 – Nov 2025</p>
+                      <p className="text-blue-300 text-xs md:text-sm">
+                        Volvo Group • Jun 2025 – Nov 2025
+                      </p>
                       <TechIcons
-                        tech={["python", "git", "docker", "langchain", "azure", "azuredevops", "deepeval"]}
+                        tech={[
+                          "python",
+                          "git",
+                          "docker",
+                          "langchain",
+                          "azure",
+                          "azuredevops",
+                          "deepeval",
+                        ]}
                         className="flex"
                       />
                     </div>
@@ -67,16 +112,21 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  Designing an agentic LLM platform (LangChain + RAG) for 15k teammates; boosted retrieval accuracy by
-                  25% and baked evaluation checkpoints into delivery.
+                  Designing an agentic LLM platform (LangChain + RAG) for 15k
+                  teammates; boosted retrieval accuracy by 25% and baked
+                  evaluation checkpoints into delivery.
                 </p>
               </details>
               <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-sm md:text-lg font-medium text-white">Freelance Software Engineer</h3>
+                    <h3 className="text-sm md:text-lg font-medium text-white">
+                      Freelance Software Engineer
+                    </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">ETIC INSA LYON (EDF - TOSIT) • Jan 2024 – Dec 2024</p>
+                      <p className="text-blue-300 text-xs md:text-sm">
+                        ETIC INSA LYON (EDF - TOSIT) • Jan 2024 – Dec 2024
+                      </p>
                       <TechIcons
                         tech={[
                           "apache iceberg",
@@ -95,24 +145,39 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  Modernized distributed analytics over 5TB+ with Iceberg/Trino; cut query times by 30% and locked
-                  access behind Apache Knox so data teams could focus on insight instead of infrastructure.
+                  Modernized distributed analytics over 5TB+ with Iceberg/Trino;
+                  cut query times by 30% and locked access behind Apache Knox so
+                  data teams could focus on insight instead of infrastructure.
                 </p>
               </details>
               <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-sm md:text-lg font-medium text-white">Fullstack Web Developer</h3>
+                    <h3 className="text-sm md:text-lg font-medium text-white">
+                      Fullstack Web Developer
+                    </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">OnePoint • Apr 2024 – Jun 2024</p>
-                      <TechIcons tech={["angular", "spring", "git", "terraform", "azure"]} className="flex" />
+                      <p className="text-blue-300 text-xs md:text-sm">
+                        OnePoint • Apr 2024 – Jun 2024
+                      </p>
+                      <TechIcons
+                        tech={[
+                          "angular",
+                          "spring",
+                          "git",
+                          "terraform",
+                          "azure",
+                        ]}
+                        className="flex"
+                      />
                     </div>
                   </div>
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  Redesigned a sports management platform with Angular and Spring Boot, adding media uploads and live
-                  event coverage that pulled users back in every weekend.
+                  Redesigned a sports management platform with Angular and
+                  Spring Boot, adding media uploads and live event coverage that
+                  pulled users back in every weekend.
                 </p>
               </details>
 
@@ -120,22 +185,30 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
               <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-sm md:text-lg font-medium text-white">Data Science Intern</h3>
+                    <h3 className="text-sm md:text-lg font-medium text-white">
+                      Data Science Intern
+                    </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">Volvo Group • Jun 2023 – Sep 2023</p>
-                      <TechIcons tech={["powerbi", "python", "pytorch", "vba", "sql"]} className="flex" />
+                      <p className="text-blue-300 text-xs md:text-sm">
+                        Volvo Group • Jun 2023 – Sep 2023
+                      </p>
+                      <TechIcons
+                        tech={["powerbi", "python", "pytorch", "vba", "sql"]}
+                        className="flex"
+                      />
                     </div>
                   </div>
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  Automated data pipelines and built reporting tools, cutting manual work by 40% for 10+ analysts; shipped
-                  PyTorch models to triage service requests.
+                  Automated data pipelines and built reporting tools, cutting
+                  manual work by 40% for 10+ analysts; shipped PyTorch models to
+                  triage service requests.
                 </p>
               </details>
             </div>
           </>
-        )
+        );
 
       case "projects":
         return (
@@ -148,7 +221,9 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm md:text-lg font-medium text-white">TAILOR — ML‑Powered Social App</h3>
+                      <h3 className="text-sm md:text-lg font-medium text-white">
+                        TAILOR — ML‑Powered Social App
+                      </h3>
                       <a
                         className="text-green-200 text-[11px] md:text-xs underline underline-offset-4 hover:text-white transition-colors"
                         href="https://tailorapp.fr"
@@ -159,9 +234,19 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
                       </a>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-green-300 text-xs md:text-sm">Ongoing</p>
+                      <p className="text-green-300 text-xs md:text-sm">
+                        Ongoing
+                      </p>
                       <TechIcons
-                        tech={["reactnative", "spring", "qdrant", "expo", "fastapi", "gitlab", "postgres"]}
+                        tech={[
+                          "reactnative",
+                          "spring",
+                          "qdrant",
+                          "expo",
+                          "fastapi",
+                          "gitlab",
+                          "postgres",
+                        ]}
                         className="flex"
                       />
                     </div>
@@ -169,29 +254,35 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  I’m shipping a social app where people tune their feed with pluggable recommender strategies. Blends
-                  clustering and vector search (Qdrant) with an API‑first, Expo-powered experience.
+                  I’m shipping a social app where people tune their feed with
+                  pluggable recommender strategies. Blends clustering and vector
+                  search (Qdrant) with an API‑first, Expo-powered experience.
                 </p>
               </details>
               <details className="border-l-2 border-green-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-sm md:text-lg font-medium text-white">Multi Agent Path-Finding</h3>
+                    <h3 className="text-sm md:text-lg font-medium text-white">
+                      Multi Agent Path-Finding
+                    </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-green-300 text-xs md:text-sm">Unity • Feb 2025</p>
+                      <p className="text-green-300 text-xs md:text-sm">
+                        Unity • Feb 2025
+                      </p>
                       <TechIcons tech={["unity", "csharp"]} className="flex" />
                     </div>
                   </div>
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  Built Conflict‑Based Search (CBS) for drone swarms; coordinated 50+ agents with ~40% fewer collisions
-                  and live planner/constraint visualizations.
+                  Built Conflict‑Based Search (CBS) for drone swarms;
+                  coordinated 50+ agents with ~40% fewer collisions and live
+                  planner/constraint visualizations.
                 </p>
               </details>
             </div>
           </>
-        )
+        );
 
       case "skills":
         return (
@@ -201,38 +292,101 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
             </h2>
             <div className="space-y-3 md:space-y-4 max-w-xs md:max-w-2xl">
               <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">Machine Learning & AI</h3>
+                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
+                  Machine Learning & AI
+                </h3>
                 <p className="text-amber-300 text-xs md:text-sm">
-                  PyTorch, TensorFlow, scikit‑learn, Hugging Face, LangChain, RAG, NLP, model evaluation
+                  PyTorch, TensorFlow, scikit‑learn, Hugging Face, LangChain,
+                  RAG, NLP, model evaluation
                 </p>
               </div>
               <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">Programming Languages</h3>
-                <p className="text-amber-300 text-xs md:text-sm">Python, C++, JavaScript, TypeScript, SQL</p>
-              </div>
-              <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">Data & Infrastructure</h3>
+                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
+                  Programming Languages
+                </h3>
                 <p className="text-amber-300 text-xs md:text-sm">
-                  Qdrant, Apache Iceberg, Trino, Spark, Apache Knox, Azure, Docker, Terraform
+                  Python, C++, JavaScript, TypeScript, SQL
                 </p>
               </div>
               <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">Languages</h3>
+                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
+                  Data & Infrastructure
+                </h3>
+                <p className="text-amber-300 text-xs md:text-sm">
+                  Qdrant, Apache Iceberg, Trino, Spark, Apache Knox, Azure,
+                  Docker, Terraform
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
+                  Languages
+                </h3>
                 <p className="text-amber-300 text-xs md:text-sm">
                   French (Fluent), English (TOEFL iBT: 109/120), Arabic (Fluent)
                 </p>
               </div>
             </div>
           </>
-        )
+        );
+
+      case "score":
+        return (
+          <>
+            <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-3 md:mb-4">
+              SCORE
+            </h2>
+            <div>
+              <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
+                {handName}
+              </h3>
+              <p className="text-red-300 text-xs md:text-sm">
+                {performanceText}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 mb-6 mt-6">
+              {cardSections.map((sectionKey) => {
+                const card = sectionCards[sectionKey];
+                return (
+                    <PlayingCard
+                      card={card}
+                      size="md"
+                      flipKey={`score-${sectionKey}-${card?.id ?? "none"}`}
+                      label={`${sectionKey} card`}
+                    />
+                );
+              })}
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-xl border border-white/15 px-4 py-3 text-white">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-white/60">
+                  Total
+                </p>
+                <p className="text-xl font-semibold leading-tight">
+                  {totalScore} pts
+                </p>
+                <p className="text-xs text-white/70">
+                  {drawnCount}/{cardSections.length} cards drawn
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onReset}
+                className="px-4 md:px-6 py-2 md:py-3 rounded-full bg-white text-black text-sm font-normal transition-all duration-200 hover:bg-white/90"
+              >
+                Try again
+              </button>
+            </div>
+          </>
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
-    <main className="absolute bottom-4 md:bottom-8 left-4 md:left-8 right-20 md:right-32 z-20">
+    <main className="absolute bottom-4 md:bottom-8 left-4 md:left-8 right-4 md:right-32 z-20">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeSection}
@@ -265,5 +419,5 @@ export default function HeroContent({ activeSection, direction }: HeroContentPro
         </motion.div>
       </AnimatePresence>
     </main>
-  )
+  );
 }

@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     template: "%s | Zyad Haddad",
   },
   description:
-    "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH who ships AI products, distributed systems, and web experiences.",
+    "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH.",
   keywords: [
     "Zyad Haddad",
     "AI engineer",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Zyad Haddad | AI Engineer & Full-Stack Developer",
     description:
-      "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH who ships AI products, distributed systems, and web experiences.",
+      "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH.",
   },
   robots: {
     index: true,

@@ -11,11 +11,12 @@ interface ShaderBackgroundProps {
   transitionDirection?: "up" | "down" | null;
 }
 
-const colorSchemes = {
+const colorSchemes: Record<PortfolioSection, string[]> = {
   intro: ["#000000", "#8b5cf6", "#ffffff", "#1e1b4b", "#4c1d95"],
   experience: ["#000000", "#3b82f6", "#ffffff", "#1e3a8a", "#1d4ed8"],
   projects: ["#000000", "#10b981", "#ffffff", "#064e3b", "#047857"],
   skills: ["#000000", "#f59e0b", "#ffffff", "#92400e", "#d97706"],
+  score: ["#000000", "#EE4B2B", "#ffffff", "#880808", "#D2042D"],
 };
 
 export default function ShaderBackground({
@@ -28,10 +29,10 @@ export default function ShaderBackground({
   const isTransitioning = Boolean(transitionDirection);
 
   // Memoize color arrays so only section change updates them
-  const baseColors = useMemo(
-    () => colorSchemes[activeSection],
-    [activeSection]
-  );
+  const baseColors = useMemo(() => {
+    const colors = colorSchemes[activeSection];
+    return colors ?? colorSchemes.intro;
+  }, [activeSection]);
   const overlayColors = useMemo(
     () => ["#000000", "#ffffff", baseColors[1], "#000000"],
     [baseColors]

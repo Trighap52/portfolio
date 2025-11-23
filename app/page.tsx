@@ -3,16 +3,24 @@
 import HeroContent from "@/components/hero-content"
 import ShaderBackground from "@/components/shader-background"
 import PortfolioSidebar from "@/components/portfolio-sidebar"
-import { useState, useEffect, useRef } from "react"
+import { PlayingCard } from "@/components/playing-card"
+import { buildDeck, shuffleDeck } from "@/lib/cards"
+import type { CardInfo } from "@/lib/cards"
+import { useState, useEffect, useRef, useMemo } from "react"
 
-export type PortfolioSection = "intro" | "experience" | "projects" | "skills"
+export type PortfolioSection = "intro" | "experience" | "projects" | "skills" | "score"
+const SECTION_ORDER: PortfolioSection[] = ["intro", "experience", "projects", "skills", "score"]
+const CARD_SECTIONS: PortfolioSection[] = ["intro", "experience", "projects", "skills", "score"]
 
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState<PortfolioSection>("intro")
   const [transitionDir, setTransitionDir] = useState<"up" | "down" | null>(null)
   const throttleRef = useRef(false)
   const touchStartY = useRef<number | null>(null)
-  
+  const drawIndex = useRef(0)
+  const deck = useMemo(() => shuffleDeck(buildDeck()), [])
+  const [sectionCards, setSectionCards] = useState<Partial<Record<PortfolioSection, CardInfo>>>({})
+
 
   useEffect(() => {
     // Lock page scroll to avoid conflicts with section-based navigation
@@ -33,21 +41,19 @@ export default function Portfolio() {
   }, [])
 
   useEffect(() => {
-    const sections: PortfolioSection[] = ["intro", "experience", "projects", "skills"]
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      const currentIndex = sections.indexOf(activeSection)
+      const currentIndex = SECTION_ORDER.indexOf(activeSection)
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
         e.preventDefault()
-        const nextIndex = (currentIndex + 1) % sections.length
+        const nextIndex = (currentIndex + 1) % SECTION_ORDER.length
         setTransitionDir("down")
-        setActiveSection(sections[nextIndex])
+        setActiveSection(SECTION_ORDER[nextIndex])
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
         e.preventDefault()
-        const prevIndex = (currentIndex - 1 + sections.length) % sections.length
+        const prevIndex = (currentIndex - 1 + SECTION_ORDER.length) % SECTION_ORDER.length
         setTransitionDir("up")
-        setActiveSection(sections[prevIndex])
+        setActiveSection(SECTION_ORDER[prevIndex])
       } else if (e.key === "Enter") {
         e.preventDefault()
       }
@@ -66,8 +72,6 @@ export default function Portfolio() {
   }, [activeSection, transitionDir])
 
   useEffect(() => {
-    const sections: PortfolioSection[] = ["intro", "experience", "projects", "skills"]
-
     const onWheel = (e: WheelEvent) => {
       if (throttleRef.current) return
       if (Math.abs(e.deltaY) < 20) return
@@ -77,15 +81,15 @@ export default function Portfolio() {
         throttleRef.current = false
       }, 650)
 
-      const currentIndex = sections.indexOf(activeSection)
+      const currentIndex = SECTION_ORDER.indexOf(activeSection)
       if (e.deltaY > 0) {
-        const nextIndex = (currentIndex + 1) % sections.length
+        const nextIndex = (currentIndex + 1) % SECTION_ORDER.length
         setTransitionDir("down")
-        setActiveSection(sections[nextIndex])
+        setActiveSection(SECTION_ORDER[nextIndex])
       } else if (e.deltaY < 0) {
-        const prevIndex = (currentIndex - 1 + sections.length) % sections.length
+        const prevIndex = (currentIndex - 1 + SECTION_ORDER.length) % SECTION_ORDER.length
         setTransitionDir("up")
-        setActiveSection(sections[prevIndex])
+        setActiveSection(SECTION_ORDER[prevIndex])
       }
     }
 
@@ -105,15 +109,15 @@ export default function Portfolio() {
         throttleRef.current = false
       }, 650)
 
-      const currentIndex = sections.indexOf(activeSection)
+      const currentIndex = SECTION_ORDER.indexOf(activeSection)
       if (deltaY < 0) {
-        const nextIndex = (currentIndex + 1) % sections.length
+        const nextIndex = (currentIndex + 1) % SECTION_ORDER.length
         setTransitionDir("down")
-        setActiveSection(sections[nextIndex])
+        setActiveSection(SECTION_ORDER[nextIndex])
       } else {
-        const prevIndex = (currentIndex - 1 + sections.length) % sections.length
+        const prevIndex = (currentIndex - 1 + SECTION_ORDER.length) % SECTION_ORDER.length
         setTransitionDir("up")
-        setActiveSection(sections[prevIndex])
+        setActiveSection(SECTION_ORDER[prevIndex])
       }
     }
 
@@ -127,13 +131,61 @@ export default function Portfolio() {
     }
   }, [activeSection])
 
+  useEffect(() => {
+    if (!sectionCards[activeSection]) {
+      const nextCard = deck[drawIndex.current % deck.length]
+      drawIndex.current += 1
+      setSectionCards((prev) => ({ ...prev, [activeSection]: nextCard }))
+    }
+  }, [activeSection, deck, sectionCards])
+
+  const activeCard = sectionCards[activeSection]
+  const totalScore = useMemo(
+    () =>
+      CARD_SECTIONS.reduce((sum, key) => {
+        const card = sectionCards[key]
+        return sum + (card?.value ?? 0)
+      }, 0),
+    [sectionCards]
+  )
+  const drawnCount = useMemo(
+    () => CARD_SECTIONS.filter((key) => sectionCards[key]).length,
+    [sectionCards]
+  )
+
+  const handleReset = () => {
+    window.location.reload()
+  }
+
   return (
     <ShaderBackground activeSection={activeSection} transitionDirection={transitionDir}>
+      {activeSection !== "score" && (
+        <div className="absolute top-4 left-1/2 z-30 -translate-x-1/2 flex flex-col items-center gap-2 mt-6">
+          <PlayingCard
+            card={activeCard}
+            size="md"
+            flipKey={`active-${activeCard?.id ?? "none"}`}
+            label="Active section card"
+          />
+        </div>
+      )}
+
       <div className="absolute inset-4 border-2 border-white/30 rounded-lg overflow-hidden">
         <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
         <div className="relative h-full">
-          <HeroContent activeSection={activeSection} direction={transitionDir} />
-          <PortfolioSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+          <HeroContent
+            activeSection={activeSection}
+            direction={transitionDir}
+            sectionCards={sectionCards}
+            totalScore={totalScore}
+            onReset={handleReset}
+            cardSections={CARD_SECTIONS}
+          />
+          <PortfolioSidebar
+            activeSection={activeSection}
+            setActiveSection={setActiveSection}
+            sectionCards={sectionCards}
+          />
         </div>
       </div>
     </ShaderBackground>
