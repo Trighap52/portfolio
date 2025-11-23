@@ -20,6 +20,14 @@ export default function Portfolio() {
   const drawIndex = useRef(0)
   const deck = useMemo(() => shuffleDeck(buildDeck()), [])
   const [sectionCards, setSectionCards] = useState<Partial<Record<PortfolioSection, CardInfo>>>({})
+  const scoreUnlocked = useMemo(
+    () => ["intro", "experience", "projects", "skills"].every((key) => sectionCards[key as PortfolioSection]),
+    [sectionCards]
+  )
+  const navSections = useMemo(
+    () => (scoreUnlocked ? SECTION_ORDER : SECTION_ORDER.filter((s) => s !== "score")),
+    [scoreUnlocked]
+  )
 
 
   useEffect(() => {
@@ -42,18 +50,18 @@ export default function Portfolio() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const currentIndex = SECTION_ORDER.indexOf(activeSection)
+      const currentIndex = navSections.indexOf(activeSection)
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
         e.preventDefault()
-        const nextIndex = (currentIndex + 1) % SECTION_ORDER.length
+        const nextIndex = (currentIndex + 1) % navSections.length
         setTransitionDir("down")
-        setActiveSection(SECTION_ORDER[nextIndex])
+        setActiveSection(navSections[nextIndex])
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
         e.preventDefault()
-        const prevIndex = (currentIndex - 1 + SECTION_ORDER.length) % SECTION_ORDER.length
+        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
         setTransitionDir("up")
-        setActiveSection(SECTION_ORDER[prevIndex])
+        setActiveSection(navSections[prevIndex])
       } else if (e.key === "Enter") {
         e.preventDefault()
       }
@@ -61,7 +69,7 @@ export default function Portfolio() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [activeSection])
+  }, [activeSection, navSections])
 
   useEffect(() => {
     // Clear the transition hint shortly after section changes
@@ -81,15 +89,15 @@ export default function Portfolio() {
         throttleRef.current = false
       }, 650)
 
-      const currentIndex = SECTION_ORDER.indexOf(activeSection)
+      const currentIndex = navSections.indexOf(activeSection)
       if (e.deltaY > 0) {
-        const nextIndex = (currentIndex + 1) % SECTION_ORDER.length
+        const nextIndex = (currentIndex + 1) % navSections.length
         setTransitionDir("down")
-        setActiveSection(SECTION_ORDER[nextIndex])
+        setActiveSection(navSections[nextIndex])
       } else if (e.deltaY < 0) {
-        const prevIndex = (currentIndex - 1 + SECTION_ORDER.length) % SECTION_ORDER.length
+        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
         setTransitionDir("up")
-        setActiveSection(SECTION_ORDER[prevIndex])
+        setActiveSection(navSections[prevIndex])
       }
     }
 
@@ -109,15 +117,15 @@ export default function Portfolio() {
         throttleRef.current = false
       }, 650)
 
-      const currentIndex = SECTION_ORDER.indexOf(activeSection)
+      const currentIndex = navSections.indexOf(activeSection)
       if (deltaY < 0) {
-        const nextIndex = (currentIndex + 1) % SECTION_ORDER.length
+        const nextIndex = (currentIndex + 1) % navSections.length
         setTransitionDir("down")
-        setActiveSection(SECTION_ORDER[nextIndex])
+        setActiveSection(navSections[nextIndex])
       } else {
-        const prevIndex = (currentIndex - 1 + SECTION_ORDER.length) % SECTION_ORDER.length
+        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
         setTransitionDir("up")
-        setActiveSection(SECTION_ORDER[prevIndex])
+        setActiveSection(navSections[prevIndex])
       }
     }
 
@@ -129,7 +137,7 @@ export default function Portfolio() {
       window.removeEventListener("touchstart", onTouchStart as EventListener)
       window.removeEventListener("touchend", onTouchEnd as EventListener)
     }
-  }, [activeSection])
+  }, [activeSection, navSections])
 
   useEffect(() => {
     if (!sectionCards[activeSection]) {
@@ -152,7 +160,6 @@ export default function Portfolio() {
     () => CARD_SECTIONS.filter((key) => sectionCards[key]).length,
     [sectionCards]
   )
-
   const handleReset = () => {
     window.location.reload()
   }
@@ -185,6 +192,7 @@ export default function Portfolio() {
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             sectionCards={sectionCards}
+            scoreUnlocked={scoreUnlocked}
           />
         </div>
       </div>

@@ -104,7 +104,7 @@ export default function ShaderBackground({
       <MeshGradient
         className="absolute inset-0 w-full h-full"
         colors={baseColors}
-        speed={0.1 + (isTransitioning ? 0.4 : 0)}
+        speed={0.4 + (isTransitioning ? 0.8 : 0)}
         distortion={1}
         swirl={0.2}
         // Remove invalid DOM prop warning: backgroundColor isn't a valid MeshGradient prop in this setup

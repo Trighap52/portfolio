@@ -61,7 +61,7 @@ export function PlayingCard({ card, size = "md", flipKey, label }: PlayingCardPr
           </div>
           <div className="flex items-center justify-between text-[11px] md:text-xs font-semibold opacity-80">
             <span className={`font-bold ${suitColor}`}>{suitIcon}</span>
-            <span>{card ? `${card.value} pts` : "Drawn soon"}</span>
+            {card?.rank ?? "?"}
           </div>
         </div>
         <div

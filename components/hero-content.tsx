@@ -30,15 +30,22 @@ export default function HeroContent({
     cardSections.map((key) => sectionCards[key]).filter(Boolean) as CardInfo[]
   );
 
-  const performanceText = (() => {
-    if (totalScore >= 40)
-      return "Royal engineer — stacked hand, stacked impact.";
-    if (totalScore >= 30)
-      return "Strong hand — consistent wins across the board.";
-    if (totalScore >= 20)
-      return "Solid draw — a few more cards and it’s a flush.";
-    return "Tough shuffle — reshuffle and push for a better draw.";
-  })();
+const performanceText = (() => {
+  const texts: Record<string, string> = {
+    "Royal Flush": "Unbelievable! The absolute best hand possible!",
+    "Straight Flush": "You're on fire!",
+    "Four of a Kind": "Pure domination.",
+    "Full House": "A powerful and reliable hand.",
+    "Flush": "All suits aligned in your favor.",
+    "Straight": "Nice and clean.",
+    "Three of a Kind": "Solid power.",
+    "Two Pair": "Looking good.",
+    "Pair": "Not bad, could be better!",
+    "High Card": "Maybe next time!"
+  };
+
+  return texts[handName];
+})();
   const renderContent = () => {
     switch (activeSection) {
       case "intro":
@@ -335,44 +342,37 @@ export default function HeroContent({
             <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-3 md:mb-4">
               SCORE
             </h2>
-            <div>
-              <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
-                {handName}
-              </h3>
-              <p className="text-red-300 text-xs md:text-sm">
-                {performanceText}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 mb-6 mt-6">
+            <div className="grid grid-cols-5 gap-2 md:gap-4 mb-6 mt-6 items-start">
               {cardSections.map((sectionKey) => {
                 const card = sectionCards[sectionKey];
                 return (
+                  <div
+                    key={`score-card-${sectionKey}-${card?.id ?? "none"}`}
+                    className="flex flex-col items-center gap-2"
+                  >
                     <PlayingCard
                       card={card}
-                      size="md"
+                      size="sm"
                       flipKey={`score-${sectionKey}-${card?.id ?? "none"}`}
                       label={`${sectionKey} card`}
                     />
+                  </div>
                 );
               })}
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-xl border border-white/15 px-4 py-3 text-white">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-white/60">
-                  Total
-                </p>
                 <p className="text-xl font-semibold leading-tight">
-                  {totalScore} pts
+                  {handName}
                 </p>
                 <p className="text-xs text-white/70">
-                  {drawnCount}/{cardSections.length} cards drawn
+                  {performanceText}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onReset}
-                className="px-4 md:px-6 py-2 md:py-3 rounded-full bg-white text-black text-sm font-normal transition-all duration-200 hover:bg-white/90"
+                className="px-4 md:px-6 py-2 md:py-3 rounded-full bg-white text-black text-xs font-normal transition-all duration-200 hover:bg-white/90"
               >
                 Try again
               </button>

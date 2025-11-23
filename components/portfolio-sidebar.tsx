@@ -1,22 +1,25 @@
 "use client"
 import type { PortfolioSection } from "@/app/page"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { CardInfo } from "@/lib/cards"
 
 interface PortfolioSidebarProps {
   activeSection: PortfolioSection
   setActiveSection: (section: PortfolioSection) => void
   sectionCards: Partial<Record<PortfolioSection, CardInfo>>
+  scoreUnlocked: boolean
 }
 
 function MiniCard({
   card,
   visited,
   active,
+  tint,
 }: {
   card?: CardInfo
   visited: boolean
   active: boolean
+  tint: string
 }) {
   const suitSymbols: Record<CardInfo["suit"], string> = {
     H: "♥",
@@ -51,32 +54,53 @@ function MiniCard({
           <span className={suitClass}>{suitIcon}</span>
         </div>
         <div
-          className="absolute inset-0 rounded-[3px] bg-gradient-to-br from-purple-500/70 to-indigo-600/80"
-          style={{ transform: "rotateY(180deg)", backfaceVisibility: "hidden" }}
+          className="absolute inset-0 rounded-[3px]"
+          style={{
+            transform: "rotateY(180deg)",
+            backfaceVisibility: "hidden",
+            background: `linear-gradient(135deg, ${tint} 0%, ${tint}d0 100%)`,
+          }}
         />
       </div>
     </div>
   )
 }
 
-export default function PortfolioSidebar({ activeSection, setActiveSection, sectionCards }: PortfolioSidebarProps) {
-  const [revealed, setRevealed] = useState(false)
+export default function PortfolioSidebar({
+  activeSection,
+  setActiveSection,
+  sectionCards,
+  scoreUnlocked,
+}: PortfolioSidebarProps) {
+  const [revealed, setRevealed] = useState(true)
+  const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const sectionTints: Record<PortfolioSection, string> = {
+    intro: "#8b5cf6",
+    experience: "#3b82f6",
+    projects: "#10b981",
+    skills: "#f59e0b",
+    score: "#EE4B2B",
+  }
+  const activeTint = sectionTints[activeSection] ?? "#8b5cf6"
 
   // Reveal on first interaction on mobile only
   useEffect(() => {
     if (!window.matchMedia("(max-width: 767px)").matches) return
     const onFirst = () => {
       setRevealed(true)
-      window.removeEventListener("wheel", onFirst as EventListener)
-      window.removeEventListener("touchstart", onFirst as EventListener)
     }
     window.addEventListener("wheel", onFirst as EventListener, { passive: true })
-    window.addEventListener("touchstart", onFirst as EventListener, { passive: true })
     return () => {
-      window.removeEventListener("wheel", onFirst as EventListener)
-      window.removeEventListener("touchstart", onFirst as EventListener)
     }
   }, [])
+
+  useEffect(() => {
+    if (revealTimer.current) clearTimeout(revealTimer.current)
+    revealTimer.current = setTimeout(() => setRevealed(false), 1000)
+    return () => {
+      if (revealTimer.current) clearTimeout(revealTimer.current)
+    }
+  }, [revealed])
   const menuItems = [
     { id: "intro" as PortfolioSection, label: "About" },
     { id: "experience" as PortfolioSection, label: "Experience" },
@@ -90,7 +114,7 @@ export default function PortfolioSidebar({ activeSection, setActiveSection, sect
   return (
     <nav
       className={`absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-20 transition-transform duration-300 will-change-transform
-                  ${revealed ? "translate-x-0" : "translate-x-10"} md:translate-x-0`}
+                  ${revealed ? "translate-x-0" : "translate-x-30"} md:translate-x-0`}
       data-mobile-slide
       aria-label="Portfolio section navigation"
     >
@@ -98,20 +122,26 @@ export default function PortfolioSidebar({ activeSection, setActiveSection, sect
         {menuItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => setActiveSection(item.id)}
+            onClick={() => {
+              if (item.id === "score" && !scoreUnlocked) return
+              setActiveSection(item.id)
+            }}
             type="button"
             aria-current={activeSection === item.id ? "page" : undefined}
+            aria-disabled={item.id === "score" && !scoreUnlocked}
             className={`
               group flex items-center justify-end gap-2 md:gap-4 transition-all duration-300
-              ${activeSection === item.id ? "text-white transform -translate-x-1 md:-translate-x-2" : "text-white/50 hover:text-white/80"}
+              ${item.id === "score" && !scoreUnlocked ? "text-white/30 cursor-not-allowed" : activeSection === item.id ? "text-white transform -translate-x-1 md:-translate-x-2" : "text-white/50 hover:text-white/80"}
             focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-full
             `}
+            disabled={item.id === "score" && !scoreUnlocked}
           >
             <span className="text-sm md:text-xl font-light whitespace-nowrap">{item.label}</span>
             <MiniCard
               card={sectionCards[item.id]}
               visited={Boolean(sectionCards[item.id])}
               active={activeSection === item.id}
+              tint={activeTint}
             />
           </button>
         ))}
