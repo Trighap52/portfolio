@@ -59,7 +59,8 @@ export default function ShaderBackground({
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-black relative overflow-hidden"
+      className="min-h-[100dvh] bg-black relative overflow-hidden"
+      style={{ paddingBottom: "var(--safe-area-bottom)" }}
     >
       {/* SVG Filters */}
       <svg className="absolute inset-0 w-0 h-0">

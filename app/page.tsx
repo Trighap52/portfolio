@@ -177,7 +177,10 @@ export default function Portfolio() {
         </div>
       )}
 
-      <div className="absolute inset-4 border-2 border-white/30 rounded-lg overflow-hidden">
+      <div
+        className="absolute top-4 left-4 right-4 border-2 border-white/30 rounded-lg overflow-hidden"
+        style={{ bottom: "calc(1rem + var(--safe-area-bottom))" }}
+      >
         <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
         <div className="relative h-full">
           <HeroContent

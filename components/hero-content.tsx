@@ -386,7 +386,10 @@ const performanceText = (() => {
   };
 
   return (
-    <main className="absolute bottom-4 md:bottom-8 left-4 md:left-8 right-4 md:right-32 z-20">
+    <main
+      className="absolute left-4 md:left-8 right-4 md:right-32 z-20 [--hero-bottom:1rem] md:[--hero-bottom:2rem]"
+      style={{ bottom: "calc(var(--hero-bottom) + var(--safe-area-bottom))" }}
+    >
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={activeSection}

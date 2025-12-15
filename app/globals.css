@@ -41,6 +41,7 @@
   --font-instrument-serif: "Instrument Serif", serif; /* Instrument Serif font family configuration */
   /* Added Figtree as the primary font variable */
   --font-figtree: "Figtree", sans-serif; /* Figtree font family configuration */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
@@ -80,6 +81,7 @@
   --font-instrument-serif: "Instrument Serif", serif; /* Instrument Serif font family configuration */
   /* Added Figtree font variable for dark mode consistency */
   --font-figtree: "Figtree", sans-serif; /* Figtree font family configuration */
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @theme inline {
@@ -131,6 +133,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    min-height: 100dvh;
+    padding-bottom: var(--safe-area-bottom);
     /* Set Figtree as the default font family for the entire website */
     font-family: var(--font-figtree);
   }
