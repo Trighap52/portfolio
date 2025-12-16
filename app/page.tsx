@@ -66,6 +66,10 @@ export default function Portfolio() {
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
         e.preventDefault()
+        if (activeSection === "score" && allCardsRevealed) {
+          handleReset()
+          return
+        }
         const nextIndex = (currentIndex + 1) % navSections.length
         setTransitionDir("down")
         setActiveSection(navSections[nextIndex])

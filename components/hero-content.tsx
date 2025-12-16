@@ -353,7 +353,7 @@ export default function HeroContent({
             <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-3 md:mb-4">
               SCORE
             </h2>
-            <div className="grid grid-cols-5 gap-2 md:gap-4 mb-6 mt-6 items-start">
+            <div className="grid grid-cols-5 gap-2 md:gap-4 mb-6 mt-6 items-start max-w-200">
               {cardSections.map((sectionKey) => {
                 const card = sectionCards[sectionKey];
                 return (
@@ -371,7 +371,7 @@ export default function HeroContent({
                 );
               })}
             </div>
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-xl border border-white/15 px-4 py-3 text-white">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 rounded-xl border border-white/15 px-4 py-3 text-white max-w-200">
               <div>
                 <p className="text-xl font-semibold leading-tight">
                   {handName}
