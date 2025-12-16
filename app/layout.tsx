@@ -33,7 +33,7 @@ const structuredData = {
   "@type": "Person",
   name: "Zyad Haddad",
   url: siteUrl,
-  jobTitle: "AI Engineer & Full-Stack Developer",
+  jobTitle: "Software Engineer",
   affiliation: ["INSA Lyon", "KTH Royal Institute of Technology"],
   sameAs: ["https://github.com/Trighap52", "mailto:trighap52@gmail.com"],
   knowsAbout: ["Machine Learning", "Distributed Systems", "Full-Stack Development", "LangChain", "Next.js"],
@@ -42,14 +42,14 @@ const structuredData = {
 export const metadata: Metadata = {
   metadataBase,
   title: {
-    default: "Zyad Haddad | AI Engineer & Full-Stack Developer",
+    default: "Zyad Haddad | Software Engineer",
     template: "%s | Zyad Haddad",
   },
   description:
-    "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH.",
+    "Portfolio of Zyad Haddad, a Software Engineer studying at INSA Lyon and KTH.",
   keywords: [
     "Zyad Haddad",
-    "AI engineer",
+    "Software engineer",
     "full-stack developer",
     "INSA Lyon",
     "KTH",
@@ -65,9 +65,9 @@ export const metadata: Metadata = {
   publisher: "Zyad Haddad",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Zyad Haddad | AI Engineer & Full-Stack Developer",
+    title: "Zyad Haddad | Software Engineer",
     description:
-      "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH who ships AI products, distributed systems, and web experiences.",
+      "Portfolio of Zyad Haddad, a Software Engineer studying at INSA Lyon and KTH who ships AI products, distributed systems, and web experiences.",
     url: "/",
     siteName: "Zyad Haddad Portfolio",
     locale: "en_US",
@@ -75,9 +75,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zyad Haddad | AI Engineer & Full-Stack Developer",
+    title: "Zyad Haddad | Software Engineer",
     description:
-      "Portfolio of Zyad Haddad, an AI engineer and full-stack developer studying at INSA Lyon and KTH.",
+      "Portfolio of Zyad Haddad, a Software Engineer studying at INSA Lyon and KTH.",
   },
   robots: {
     index: true,

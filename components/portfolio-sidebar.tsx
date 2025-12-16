@@ -75,8 +75,8 @@ export default function PortfolioSidebar({
   const [revealed, setRevealed] = useState(true)
   const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const sectionTints: Record<PortfolioSection, string> = {
-    intro: "#8b5cf6",
-    experience: "#3b82f6",
+    intro: "#3b82f6",
+    experience: "#8b5cf6",
     projects: "#10b981",
     skills: "#f59e0b",
     score: "#EE4B2B",

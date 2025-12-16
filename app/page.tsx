@@ -6,7 +6,7 @@ import PortfolioSidebar from "@/components/portfolio-sidebar"
 import { PlayingCard } from "@/components/playing-card"
 import { buildDeck, shuffleDeck } from "@/lib/cards"
 import type { CardInfo } from "@/lib/cards"
-import { useState, useEffect, useRef, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 
 export type PortfolioSection = "intro" | "experience" | "projects" | "skills" | "score"
 const SECTION_ORDER: PortfolioSection[] = ["intro", "experience", "projects", "skills", "score"]
@@ -18,16 +18,28 @@ export default function Portfolio() {
   const throttleRef = useRef(false)
   const touchStartY = useRef<number | null>(null)
   const drawIndex = useRef(0)
-  const deck = useMemo(() => shuffleDeck(buildDeck()), [])
+  const [deck, setDeck] = useState<CardInfo[]>(() => shuffleDeck(buildDeck()))
   const [sectionCards, setSectionCards] = useState<Partial<Record<PortfolioSection, CardInfo>>>({})
   const scoreUnlocked = useMemo(
     () => ["intro", "experience", "projects", "skills"].every((key) => sectionCards[key as PortfolioSection]),
     [sectionCards]
   )
+  const allCardsRevealed = useMemo(() => CARD_SECTIONS.every((key) => sectionCards[key]), [sectionCards])
   const navSections = useMemo(
     () => (scoreUnlocked ? SECTION_ORDER : SECTION_ORDER.filter((s) => s !== "score")),
     [scoreUnlocked]
   )
+  const handleReset = useCallback(() => {
+    throttleRef.current = true
+    drawIndex.current = 0
+    setDeck(shuffleDeck(buildDeck()))
+    setSectionCards({})
+    setActiveSection("intro")
+    setTransitionDir(null)
+    setTimeout(() => {
+      throttleRef.current = false
+    }, 500)
+  }, [setDeck, setSectionCards, setActiveSection, setTransitionDir, shuffleDeck, buildDeck])
 
 
   useEffect(() => {
@@ -84,6 +96,11 @@ export default function Portfolio() {
       if (throttleRef.current) return
       if (Math.abs(e.deltaY) < 20) return
       e.preventDefault()
+      if (activeSection === "score" && allCardsRevealed) {
+        throttleRef.current = true
+        handleReset()
+        return
+      }
       throttleRef.current = true
       setTimeout(() => {
         throttleRef.current = false
@@ -112,6 +129,11 @@ export default function Portfolio() {
       if (startY == null || endY == null) return
       const deltaY = endY - startY
       if (Math.abs(deltaY) < 40) return
+      if (activeSection === "score" && allCardsRevealed) {
+        throttleRef.current = true
+        handleReset()
+        return
+      }
       throttleRef.current = true
       setTimeout(() => {
         throttleRef.current = false
@@ -137,7 +159,7 @@ export default function Portfolio() {
       window.removeEventListener("touchstart", onTouchStart as EventListener)
       window.removeEventListener("touchend", onTouchEnd as EventListener)
     }
-  }, [activeSection, navSections])
+  }, [activeSection, navSections, allCardsRevealed, handleReset])
 
   useEffect(() => {
     if (!sectionCards[activeSection]) {
@@ -147,7 +169,6 @@ export default function Portfolio() {
     }
   }, [activeSection, deck, sectionCards])
 
-  const activeCard = sectionCards[activeSection]
   const totalScore = useMemo(
     () =>
       CARD_SECTIONS.reduce((sum, key) => {
@@ -156,24 +177,32 @@ export default function Portfolio() {
       }, 0),
     [sectionCards]
   )
-  const drawnCount = useMemo(
-    () => CARD_SECTIONS.filter((key) => sectionCards[key]).length,
-    [sectionCards]
-  )
-  const handleReset = () => {
-    window.location.reload()
-  }
 
   return (
     <ShaderBackground activeSection={activeSection} transitionDirection={transitionDir}>
       {activeSection !== "score" && (
-        <div className="absolute top-4 left-1/2 z-30 -translate-x-1/2 flex flex-col items-center gap-2 mt-6">
-          <PlayingCard
-            card={activeCard}
-            size="md"
-            flipKey={`active-${activeCard?.id ?? "none"}`}
-            label="Active section card"
-          />
+        <div
+          className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 flex flex-col items-center gap-3 transition-all duration-500"
+          style={{ top: "calc(1.25rem + env(safe-area-inset-top, 0px))", bottom: "auto" }}
+        >
+          <div className="flex items-end gap-2 md:gap-3 transition-transform duration-500 scale-95">
+            {CARD_SECTIONS.map((sectionKey) => {
+              const card = sectionCards[sectionKey]
+              return (
+                <PlayingCard
+                  key={`rail-${sectionKey}-${card?.id ?? "hidden"}`}
+                  card={card}
+                  size="sm"
+                  flipKey={`rail-${sectionKey}-${card?.id ?? "hidden"}`}
+                  label={`${sectionKey} card`}
+                  revealed={Boolean(card)}
+                />
+              )
+            })}
+          </div>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-white/70">
+            Scroll to flip cards
+          </p>
         </div>
       )}
 

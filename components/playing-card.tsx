@@ -6,6 +6,7 @@ interface PlayingCardProps {
   size?: "sm" | "md" | "lg"
   flipKey?: string
   label?: string
+  revealed?: boolean
 }
 
 const suitColors: Record<CardInfo["suit"], string> = {
@@ -28,18 +29,19 @@ const sizeClasses: Record<NonNullable<PlayingCardProps["size"]>, string> = {
   lg: "w-24 h-32 md:w-28 md:h-40",
 }
 
-export function PlayingCard({ card, size = "md", flipKey, label }: PlayingCardProps) {
+export function PlayingCard({ card, size = "md", flipKey, label, revealed = true }: PlayingCardProps) {
   const faceKey = flipKey ?? card?.id ?? "card-face"
   const suitColor = card ? suitColors[card.suit] : "text-white/60"
   const suitIcon = card ? suitSymbols[card.suit] : "♣"
+  const rotation = revealed ? 0 : 180
 
   return (
     <motion.div
       key={faceKey}
-      initial={{ rotateY: 180, opacity: 0.6 }}
-      animate={{ rotateY: 0, opacity: 1 }}
+      initial={{ rotateY: rotation === 0 ? 180 : 0, opacity: 0.8 }}
+      animate={{ rotateY: rotation, opacity: 1 }}
       transition={{ duration: 0.45, ease: "easeOut" }}
-      style={{ perspective: 800 }}
+      style={{ perspective: 800, transformStyle: "preserve-3d" }}
       className="relative"
       aria-label={label}
     >
@@ -65,9 +67,11 @@ export function PlayingCard({ card, size = "md", flipKey, label }: PlayingCardPr
           </div>
         </div>
         <div
-          className="absolute inset-0 rounded-xl bg-white/10 border border-white/20"
+          className="absolute inset-0 rounded-xl border border-white/20 bg-gradient-to-br from-white/10 to-white/5"
           style={{ transform: "rotateY(180deg)", backfaceVisibility: "hidden" }}
-        />
+        >
+          <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.1),transparent_45%),radial-gradient(circle_at_50%_80%,rgba(255,255,255,0.12),transparent_35%)]" />
+        </div>
       </div>
     </motion.div>
   )

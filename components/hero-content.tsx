@@ -7,6 +7,7 @@ import { ChevronDown } from "lucide-react";
 import { PlayingCard } from "@/components/playing-card";
 import type { CardInfo } from "@/lib/cards";
 import { describeHand } from "@/lib/cards";
+import Image from "next/image";
 
 interface HeroContentProps {
   activeSection: PortfolioSection;
@@ -25,44 +26,54 @@ export default function HeroContent({
   onReset,
   cardSections,
 }: HeroContentProps) {
-  const drawnCount = cardSections.filter((key) => sectionCards[key]).length;
   const handName = describeHand(
     cardSections.map((key) => sectionCards[key]).filter(Boolean) as CardInfo[]
   );
 
-const performanceText = (() => {
-  const texts: Record<string, string> = {
-    "Royal Flush": "Unbelievable! The absolute best hand possible!",
-    "Straight Flush": "You're on fire!",
-    "Four of a Kind": "Pure domination.",
-    "Full House": "A powerful and reliable hand.",
-    "Flush": "All suits aligned in your favor.",
-    "Straight": "Nice and clean.",
-    "Three of a Kind": "Solid power.",
-    "Two Pair": "Looking good.",
-    "Pair": "Not bad, could be better!",
-    "High Card": "Maybe next time!"
-  };
+  const performanceText = (() => {
+    const texts: Record<string, string> = {
+      "Royal Flush": "Unbelievable! The absolute best hand possible!",
+      "Straight Flush": "You're on fire!",
+      "Four of a Kind": "Pure domination.",
+      "Full House": "A powerful and reliable hand.",
+      Flush: "All suits aligned in your favor.",
+      Straight: "Nice and clean.",
+      "Three of a Kind": "Solid power.",
+      "Two Pair": "Looking good.",
+      Pair: "Not bad, could be better!",
+      "High Card": "Maybe next time!",
+    };
 
-  return texts[handName];
-})();
+    return texts[handName];
+  })();
   const renderContent = () => {
     switch (activeSection) {
       case "intro":
         return (
           <>
-            <h1 className="text-4xl md:text-6xl md:leading-16 tracking-tight font-light text-white mb-4">
-              <span className="font-medium italic instrument">ZYAD</span>
-              <br />
-              <span className="font-medium italic instrument">HADDAD</span>
-            </h1>
+            <div className="flex items-center gap-4 md:gap-6 mb-4">
+              <div className="relative h-14 w-14 md:h-16 md:w-16 overflow-hidden rounded-full border border-white/30 shadow-lg shadow-black/30">
+                <Image
+                  src="/zyad-haddad.jpeg"
+                  alt="Portrait of Zyad Haddad"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="64px"
+                />
+              </div>
+              <h1 className="text-4xl md:text-6xl md:leading-16 tracking-tight font-light text-white">
+                <span className="font-medium italic instrument">ZYAD</span>
+                <br />
+                <span className="font-medium italic instrument">HADDAD</span>
+              </h1>
+            </div>
             <p className="text-xs md:text-sm font-light text-white/70 mb-6 leading-relaxed max-w-xs md:max-w-md">
-              Hi, I’m Zyad Haddad, a CS engineer splitting a double M.Sc.
-              between INSA Lyon and KTH. I love shipping AI-powered tools,
-              resilient distributed systems, and playful web experiences that
-              people actually use. If we’re not talking tech, I’m likely working
-              on side-projects, contributing to open-source, or lost in a
-              Balatro run.
+              Hi, I’m Zyad 👋 I’m a computer science engineer doing a double
+              M.Sc. between INSA Lyon and KTH. I enjoy working on CS projects
+              that feel genuinely fun and useful. Outside of classes and work,
+              I’m usually hacking on side projects, contributing to open-source,
+              or getting way too invested in a Balatro run.
             </p>
             <div className="flex items-center gap-2 md:gap-4 flex-wrap">
               <a
@@ -92,14 +103,14 @@ const performanceText = (() => {
               EXPERIENCE
             </h2>
             <div className="space-y-4 md:space-y-6 max-w-xs md:max-w-2xl">
-              <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
+              <details className="border-l-2 border-purple-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
                     <h3 className="text-sm md:text-lg font-medium text-white">
                       AI Engineer Intern (Master Thesis)
                     </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">
+                      <p className="text-purple-300 text-xs md:text-sm">
                         Volvo Group • Jun 2025 – Nov 2025
                       </p>
                       <TechIcons
@@ -124,14 +135,14 @@ const performanceText = (() => {
                   evaluation checkpoints into delivery.
                 </p>
               </details>
-              <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
+              <details className="border-l-2 border-purple-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
                     <h3 className="text-sm md:text-lg font-medium text-white">
                       Freelance Software Engineer
                     </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">
+                      <p className="text-purple-300 text-xs md:text-sm">
                         ETIC INSA LYON (EDF - TOSIT) • Jan 2024 – Dec 2024
                       </p>
                       <TechIcons
@@ -157,14 +168,14 @@ const performanceText = (() => {
                   data teams could focus on insight instead of infrastructure.
                 </p>
               </details>
-              <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
+              <details className="border-l-2 border-purple-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
                     <h3 className="text-sm md:text-lg font-medium text-white">
                       Fullstack Web Developer
                     </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">
+                      <p className="text-purple-300 text-xs md:text-sm">
                         OnePoint • Apr 2024 – Jun 2024
                       </p>
                       <TechIcons
@@ -189,14 +200,14 @@ const performanceText = (() => {
               </details>
 
               {/* New Experience: Data Science Intern */}
-              <details className="border-l-2 border-blue-400 pl-3 md:pl-4 group">
+              <details className="border-l-2 border-purple-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
                     <h3 className="text-sm md:text-lg font-medium text-white">
                       Data Science Intern
                     </h3>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                      <p className="text-blue-300 text-xs md:text-sm">
+                      <p className="text-purple-300 text-xs md:text-sm">
                         Volvo Group • Jun 2023 – Sep 2023
                       </p>
                       <TechIcons
@@ -365,9 +376,7 @@ const performanceText = (() => {
                 <p className="text-xl font-semibold leading-tight">
                   {handName}
                 </p>
-                <p className="text-xs text-white/70">
-                  {performanceText}
-                </p>
+                <p className="text-xs text-white/70">{performanceText}</p>
               </div>
               <button
                 type="button"
