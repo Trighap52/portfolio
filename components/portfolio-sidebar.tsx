@@ -2,6 +2,7 @@
 import type { PortfolioSection } from "@/app/page"
 import { useEffect, useRef, useState } from "react"
 import type { CardInfo } from "@/lib/cards"
+import { PlayingCard } from "@/components/playing-card"
 
 interface PortfolioSidebarProps {
   activeSection: PortfolioSection
@@ -11,57 +12,26 @@ interface PortfolioSidebarProps {
 }
 
 function MiniCard({
+  section,
   card,
   visited,
   active,
-  tint,
 }: {
+  section: PortfolioSection
   card?: CardInfo
   visited: boolean
   active: boolean
-  tint: string
 }) {
-  const suitSymbols: Record<CardInfo["suit"], string> = {
-    H: "♥",
-    D: "♦",
-    S: "♠",
-    C: "♣",
-  }
-  const suitColor: Record<CardInfo["suit"], string> = {
-    H: "text-red-400",
-    D: "text-red-400",
-    S: "text-black",
-    C: "text-black",
-  }
-  const suitIcon = card ? suitSymbols[card.suit] : "♣"
-  const suitClass = card ? suitColor[card.suit] : "text-white/60"
-
   return (
-    <div className={`relative w-3.5 h-5 md:w-4 md:h-6`} style={{ perspective: 400 }}>
-      <div
-        className={`absolute inset-0 rounded-[3px] border border-white/30 transition-all duration-300`}
-        style={{
-          transformStyle: "preserve-3d",
-          transform: visited ? "rotateY(0deg)" : "rotateY(180deg)",
-          boxShadow: active ? "0 0 0 1px rgba(255,255,255,0.4)" : "none",
-        }}
-      >
-        <div
-          className="absolute inset-0 rounded-[3px] bg-white/15 text-[8px] md:text-[9px] font-bold text-white flex items-center justify-center gap-0.5"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <span>{card?.rank ?? "?"}</span>
-          <span className={suitClass}>{suitIcon}</span>
-        </div>
-        <div
-          className="absolute inset-0 rounded-[3px]"
-          style={{
-            transform: "rotateY(180deg)",
-            backfaceVisibility: "hidden",
-            background: `linear-gradient(135deg, ${tint} 0%, ${tint}d0 100%)`,
-          }}
-        />
-      </div>
+    <div className={`relative transition-transform duration-200 ${active ? "scale-105" : ""}`}>
+      <PlayingCard
+        card={card}
+        size="xs"
+        flipKey={`sidebar-${section}-${card?.id ?? "hidden"}-${visited ? "up" : "down"}`}
+        label={`${section} mini card`}
+        revealed={visited}
+      />
+      {active ? <div className="pointer-events-none absolute inset-0 rounded-[3px] ring-1 ring-white/80" /> : null}
     </div>
   )
 }
@@ -74,14 +44,6 @@ export default function PortfolioSidebar({
 }: PortfolioSidebarProps) {
   const [revealed, setRevealed] = useState(true)
   const revealTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const sectionTints: Record<PortfolioSection, string> = {
-    intro: "#3b82f6",
-    experience: "#8b5cf6",
-    projects: "#10b981",
-    skills: "#f59e0b",
-    score: "#EE4B2B",
-  }
-  const activeTint = sectionTints[activeSection] ?? "#8b5cf6"
 
   // Reveal on first interaction on mobile only
   useEffect(() => {
@@ -91,6 +53,7 @@ export default function PortfolioSidebar({
     }
     window.addEventListener("wheel", onFirst as EventListener, { passive: true })
     return () => {
+      window.removeEventListener("wheel", onFirst as EventListener)
     }
   }, [])
 
@@ -113,7 +76,7 @@ export default function PortfolioSidebar({
 
   return (
     <nav
-      className={`absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-20 transition-transform duration-300 will-change-transform
+      className={`hidden md:block absolute right-2 md:right-8 top-1/2 -translate-y-1/2 z-20 transition-transform duration-300 will-change-transform
                   ${revealed ? "translate-x-0" : "translate-x-30"} md:translate-x-0`}
       data-mobile-slide
       aria-label="Portfolio section navigation"
@@ -138,10 +101,10 @@ export default function PortfolioSidebar({
           >
             <span className="text-sm md:text-xl font-light whitespace-nowrap">{item.label}</span>
             <MiniCard
+              section={item.id}
               card={sectionCards[item.id]}
               visited={Boolean(sectionCards[item.id])}
               active={activeSection === item.id}
-              tint={activeTint}
             />
           </button>
         ))}

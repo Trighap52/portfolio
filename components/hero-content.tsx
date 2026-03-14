@@ -1,6 +1,7 @@
 "use client";
 
 import type { PortfolioSection } from "@/app/page";
+import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import TechIcons from "@/components/tech-icons";
 import { ChevronDown } from "lucide-react";
@@ -16,6 +17,39 @@ interface HeroContentProps {
   totalScore: number;
   onReset: () => void;
   cardSections: PortfolioSection[];
+}
+
+function AnimatedTitle({
+  text,
+  startIndex = 0,
+}: {
+  text: string;
+  startIndex?: number;
+}) {
+  return (
+    <span className="title-animated" aria-hidden="true">
+      {Array.from(text).map((char, index) => {
+        const letterIndex = startIndex + index;
+
+        if (char === " ") {
+          return <span key={`space-${letterIndex}`} className="title-space">&nbsp;</span>;
+        }
+
+        const style = {
+          ["--title-pop-delay" as string]: `${letterIndex * 28}ms`,
+          ["--title-float-delay" as string]: `${420 + letterIndex * 48}ms`,
+          ["--float-distance" as string]: `${3 + (letterIndex % 3)}px`,
+          ["--float-duration" as string]: `${2.2 + (letterIndex % 3) * 0.35}s`,
+        } as CSSProperties;
+
+        return (
+          <span key={`letter-${letterIndex}`} className="title-letter" style={style}>
+            {char}
+          </span>
+        );
+      })}
+    </span>
+  );
 }
 
 export default function HeroContent({
@@ -62,10 +96,13 @@ export default function HeroContent({
                   sizes="64px"
                 />
               </div>
-              <h1 className="text-4xl md:text-6xl md:leading-16 tracking-tight font-light text-white">
-                <span className="font-medium italic instrument">ZYAD</span>
-                <br />
-                <span className="font-medium italic instrument">HADDAD</span>
+              <h1
+                className="text-4xl md:text-6xl md:leading-16 tracking-tight font-light text-white instrument"
+                aria-label="ZYAD HADDAD"
+              >
+                <span className="font-medium whitespace-nowrap block">
+                  <AnimatedTitle text="ZYAD HADDAD" />
+                </span>
               </h1>
             </div>
             <p className="text-xs md:text-sm font-light text-white/70 mb-6 leading-relaxed max-w-xs md:max-w-md">
@@ -75,11 +112,11 @@ export default function HeroContent({
               I’m usually hacking on side projects, contributing to open-source,
               or getting way too invested in a Balatro run.
             </p>
-            <div className="flex items-center gap-2 md:gap-4 flex-wrap">
+            <div className="balatro-button-group">
               <a
                 href="https://github.com/Trighap52/"
                 target="_blank"
-                className="px-4 md:px-6 py-2 md:py-3 rounded-full bg-transparent border border-white/30 text-white font-normal text-xs transition-all duration-200 hover:bg-white/10 hover:border-white/50 cursor-pointer"
+                className="balatro-btn balatro-btn-primary"
                 rel="noreferrer"
                 aria-label="Explore my GitHub profile"
               >
@@ -87,7 +124,7 @@ export default function HeroContent({
               </a>
               <a
                 href="mailto:trighap52@gmail.com"
-                className="px-4 md:px-6 py-2 md:py-3 rounded-full bg-white text-black font-normal text-xs transition-all duration-200 hover:bg-white/90 cursor-pointer"
+                className="balatro-btn balatro-btn-secondary"
                 aria-label="Send me an email"
               >
                 Email me
@@ -99,8 +136,11 @@ export default function HeroContent({
       case "experience":
         return (
           <>
-            <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-4 md:mb-6">
-              EXPERIENCE
+            <h2
+              className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium instrument mb-4 md:mb-6"
+              aria-label="EXPERIENCE"
+            >
+              <AnimatedTitle text="EXPERIENCE" />
             </h2>
             <div className="space-y-4 md:space-y-6 max-w-xs md:max-w-2xl">
               <details className="border-l-2 border-purple-400 pl-3 md:pl-4 group">
@@ -231,8 +271,11 @@ export default function HeroContent({
       case "projects":
         return (
           <>
-            <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-4 md:mb-6">
-              PROJECTS
+            <h2
+              className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium instrument mb-4 md:mb-6"
+              aria-label="PROJECTS"
+            >
+              <AnimatedTitle text="PROJECTS" />
             </h2>
             <div className="space-y-4 md:space-y-6 max-w-xs md:max-w-2xl">
               <details className="border-l-2 border-green-400 pl-3 md:pl-4 group">
@@ -305,8 +348,11 @@ export default function HeroContent({
       case "skills":
         return (
           <>
-            <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-4 md:mb-6">
-              SKILLS
+            <h2
+              className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium instrument mb-4 md:mb-6"
+              aria-label="SKILLS"
+            >
+              <AnimatedTitle text="SKILLS" />
             </h2>
             <div className="space-y-3 md:space-y-4 max-w-xs md:max-w-2xl">
               <div>
@@ -350,8 +396,11 @@ export default function HeroContent({
       case "score":
         return (
           <>
-            <h2 className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium italic instrument mb-3 md:mb-4">
-              SCORE
+            <h2
+              className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium instrument mb-3 md:mb-4"
+              aria-label="SCORE"
+            >
+              <AnimatedTitle text="SCORE" />
             </h2>
             <div className="grid grid-cols-5 gap-2 md:gap-4 mb-6 mt-6 items-start max-w-200">
               {cardSections.map((sectionKey) => {
@@ -381,7 +430,7 @@ export default function HeroContent({
               <button
                 type="button"
                 onClick={onReset}
-                className="px-4 md:px-6 py-2 md:py-3 rounded-full bg-white text-black text-xs font-normal transition-all duration-200 hover:bg-white/90"
+                className="balatro-btn balatro-btn-secondary"
               >
                 Try again
               </button>

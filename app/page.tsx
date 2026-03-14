@@ -62,22 +62,25 @@ export default function Portfolio() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (throttleRef.current) return
       const currentIndex = navSections.indexOf(activeSection)
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
         e.preventDefault()
-        if (activeSection === "score" && allCardsRevealed) {
+        if (activeSection === "score") {
           handleReset()
           return
         }
+        throttleRef.current = true
+        setTimeout(() => {
+          throttleRef.current = false
+        }, 650)
         const nextIndex = (currentIndex + 1) % navSections.length
         setTransitionDir("down")
         setActiveSection(navSections[nextIndex])
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
         e.preventDefault()
-        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
-        setTransitionDir("up")
-        setActiveSection(navSections[prevIndex])
+        return
       } else if (e.key === "Enter") {
         e.preventDefault()
       }
@@ -85,7 +88,7 @@ export default function Portfolio() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [activeSection, navSections])
+  }, [activeSection, navSections, handleReset])
 
   useEffect(() => {
     // Clear the transition hint shortly after section changes
@@ -100,7 +103,8 @@ export default function Portfolio() {
       if (throttleRef.current) return
       if (Math.abs(e.deltaY) < 20) return
       e.preventDefault()
-      if (activeSection === "score" && allCardsRevealed) {
+      if (e.deltaY <= 0) return
+      if (activeSection === "score") {
         throttleRef.current = true
         handleReset()
         return
@@ -111,15 +115,9 @@ export default function Portfolio() {
       }, 650)
 
       const currentIndex = navSections.indexOf(activeSection)
-      if (e.deltaY > 0) {
-        const nextIndex = (currentIndex + 1) % navSections.length
-        setTransitionDir("down")
-        setActiveSection(navSections[nextIndex])
-      } else if (e.deltaY < 0) {
-        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
-        setTransitionDir("up")
-        setActiveSection(navSections[prevIndex])
-      }
+      const nextIndex = (currentIndex + 1) % navSections.length
+      setTransitionDir("down")
+      setActiveSection(navSections[nextIndex])
     }
 
     const onTouchStart = (e: TouchEvent) => {
@@ -133,7 +131,8 @@ export default function Portfolio() {
       if (startY == null || endY == null) return
       const deltaY = endY - startY
       if (Math.abs(deltaY) < 40) return
-      if (activeSection === "score" && allCardsRevealed) {
+      if (deltaY > 0) return
+      if (activeSection === "score") {
         throttleRef.current = true
         handleReset()
         return
@@ -144,15 +143,9 @@ export default function Portfolio() {
       }, 650)
 
       const currentIndex = navSections.indexOf(activeSection)
-      if (deltaY < 0) {
-        const nextIndex = (currentIndex + 1) % navSections.length
-        setTransitionDir("down")
-        setActiveSection(navSections[nextIndex])
-      } else {
-        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
-        setTransitionDir("up")
-        setActiveSection(navSections[prevIndex])
-      }
+      const nextIndex = (currentIndex + 1) % navSections.length
+      setTransitionDir("down")
+      setActiveSection(navSections[nextIndex])
     }
 
     window.addEventListener("wheel", onWheel, { passive: false })
@@ -163,7 +156,7 @@ export default function Portfolio() {
       window.removeEventListener("touchstart", onTouchStart as EventListener)
       window.removeEventListener("touchend", onTouchEnd as EventListener)
     }
-  }, [activeSection, navSections, allCardsRevealed, handleReset])
+  }, [activeSection, navSections, handleReset])
 
   useEffect(() => {
     if (!sectionCards[activeSection]) {
@@ -183,7 +176,7 @@ export default function Portfolio() {
   )
 
   return (
-    <ShaderBackground activeSection={activeSection} transitionDirection={transitionDir}>
+    <ShaderBackground>
       {activeSection !== "score" && (
         <div
           className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 flex flex-col items-center gap-3 transition-all duration-500"
@@ -214,7 +207,7 @@ export default function Portfolio() {
         className="absolute top-4 left-4 right-4 border-2 border-white/30 rounded-lg overflow-hidden"
         style={{ bottom: "calc(1rem + var(--safe-area-bottom))" }}
       >
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-black/20" />
         <div className="relative h-full">
           <HeroContent
             activeSection={activeSection}
