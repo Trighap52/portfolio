@@ -24,11 +24,7 @@ export default function Portfolio() {
     () => ["intro", "experience", "projects", "skills"].every((key) => sectionCards[key as PortfolioSection]),
     [sectionCards]
   )
-  const allCardsRevealed = useMemo(() => CARD_SECTIONS.every((key) => sectionCards[key]), [sectionCards])
-  const navSections = useMemo(
-    () => (scoreUnlocked ? SECTION_ORDER : SECTION_ORDER.filter((s) => s !== "score")),
-    [scoreUnlocked]
-  )
+  const navSections = SECTION_ORDER
   const handleReset = useCallback(() => {
     throttleRef.current = true
     drawIndex.current = 0
@@ -40,6 +36,17 @@ export default function Portfolio() {
       throttleRef.current = false
     }, 500)
   }, [setDeck, setSectionCards, setActiveSection, setTransitionDir, shuffleDeck, buildDeck])
+
+  const goToSection = useCallback(
+    (section: PortfolioSection) => {
+      if (section === activeSection) return
+      const currentIndex = SECTION_ORDER.indexOf(activeSection)
+      const targetIndex = SECTION_ORDER.indexOf(section)
+      setTransitionDir(targetIndex >= currentIndex ? "down" : "up")
+      setActiveSection(section)
+    },
+    [activeSection]
+  )
 
 
   useEffect(() => {
@@ -67,7 +74,7 @@ export default function Portfolio() {
 
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
         e.preventDefault()
-        if (activeSection === "score") {
+        if (activeSection === "score" && scoreUnlocked) {
           handleReset()
           return
         }
@@ -80,7 +87,13 @@ export default function Portfolio() {
         setActiveSection(navSections[nextIndex])
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
         e.preventDefault()
-        return
+        throttleRef.current = true
+        setTimeout(() => {
+          throttleRef.current = false
+        }, 650)
+        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
+        setTransitionDir("up")
+        setActiveSection(navSections[prevIndex])
       } else if (e.key === "Enter") {
         e.preventDefault()
       }
@@ -88,7 +101,7 @@ export default function Portfolio() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [activeSection, navSections, handleReset])
+  }, [activeSection, navSections, handleReset, scoreUnlocked])
 
   useEffect(() => {
     // Clear the transition hint shortly after section changes
@@ -103,8 +116,7 @@ export default function Portfolio() {
       if (throttleRef.current) return
       if (Math.abs(e.deltaY) < 20) return
       e.preventDefault()
-      if (e.deltaY <= 0) return
-      if (activeSection === "score") {
+      if (activeSection === "score" && e.deltaY > 0 && scoreUnlocked) {
         throttleRef.current = true
         handleReset()
         return
@@ -115,9 +127,15 @@ export default function Portfolio() {
       }, 650)
 
       const currentIndex = navSections.indexOf(activeSection)
-      const nextIndex = (currentIndex + 1) % navSections.length
-      setTransitionDir("down")
-      setActiveSection(navSections[nextIndex])
+      if (e.deltaY > 0) {
+        const nextIndex = (currentIndex + 1) % navSections.length
+        setTransitionDir("down")
+        setActiveSection(navSections[nextIndex])
+      } else if (e.deltaY < 0) {
+        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
+        setTransitionDir("up")
+        setActiveSection(navSections[prevIndex])
+      }
     }
 
     const onTouchStart = (e: TouchEvent) => {
@@ -131,8 +149,7 @@ export default function Portfolio() {
       if (startY == null || endY == null) return
       const deltaY = endY - startY
       if (Math.abs(deltaY) < 40) return
-      if (deltaY > 0) return
-      if (activeSection === "score") {
+      if (activeSection === "score" && deltaY < 0 && scoreUnlocked) {
         throttleRef.current = true
         handleReset()
         return
@@ -143,9 +160,15 @@ export default function Portfolio() {
       }, 650)
 
       const currentIndex = navSections.indexOf(activeSection)
-      const nextIndex = (currentIndex + 1) % navSections.length
-      setTransitionDir("down")
-      setActiveSection(navSections[nextIndex])
+      if (deltaY < 0) {
+        const nextIndex = (currentIndex + 1) % navSections.length
+        setTransitionDir("down")
+        setActiveSection(navSections[nextIndex])
+      } else {
+        const prevIndex = (currentIndex - 1 + navSections.length) % navSections.length
+        setTransitionDir("up")
+        setActiveSection(navSections[prevIndex])
+      }
     }
 
     window.addEventListener("wheel", onWheel, { passive: false })
@@ -156,15 +179,18 @@ export default function Portfolio() {
       window.removeEventListener("touchstart", onTouchStart as EventListener)
       window.removeEventListener("touchend", onTouchEnd as EventListener)
     }
-  }, [activeSection, navSections, handleReset])
+  }, [activeSection, navSections, handleReset, scoreUnlocked])
 
   useEffect(() => {
+    if (activeSection === "score" && !scoreUnlocked) {
+      return
+    }
     if (!sectionCards[activeSection]) {
       const nextCard = deck[drawIndex.current % deck.length]
       drawIndex.current += 1
       setSectionCards((prev) => ({ ...prev, [activeSection]: nextCard }))
     }
-  }, [activeSection, deck, sectionCards])
+  }, [activeSection, deck, sectionCards, scoreUnlocked])
 
   const totalScore = useMemo(
     () =>
@@ -186,14 +212,26 @@ export default function Portfolio() {
             {CARD_SECTIONS.map((sectionKey) => {
               const card = sectionCards[sectionKey]
               return (
-                <PlayingCard
+                <button
                   key={`rail-${sectionKey}-${card?.id ?? "hidden"}`}
-                  card={card}
-                  size="sm"
-                  flipKey={`rail-${sectionKey}-${card?.id ?? "hidden"}`}
-                  label={`${sectionKey} card`}
-                  revealed={Boolean(card)}
-                />
+                  type="button"
+                  onClick={() => goToSection(sectionKey)}
+                  className="pointer-events-auto relative focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-[10px]"
+                  aria-label={`Go to ${sectionKey}`}
+                >
+                  <PlayingCard
+                    card={card}
+                    size="sm"
+                    flipKey={`rail-${sectionKey}-${card?.id ?? "hidden"}`}
+                    label={`${sectionKey} card`}
+                    revealed={sectionKey === "score" ? scoreUnlocked && Boolean(card) : Boolean(card)}
+                  />
+                  {sectionKey === "score" && !scoreUnlocked ? (
+                    <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.16em] text-white/70">
+                      Locked
+                    </span>
+                  ) : null}
+                </button>
               )
             })}
           </div>
@@ -216,6 +254,8 @@ export default function Portfolio() {
             totalScore={totalScore}
             onReset={handleReset}
             cardSections={CARD_SECTIONS}
+            scoreUnlocked={scoreUnlocked}
+            onSelectSection={goToSection}
           />
           <PortfolioSidebar
             activeSection={activeSection}

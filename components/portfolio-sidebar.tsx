@@ -68,7 +68,7 @@ export default function PortfolioSidebar({
     { id: "intro" as PortfolioSection, label: "About" },
     { id: "experience" as PortfolioSection, label: "Experience" },
     { id: "projects" as PortfolioSection, label: "Projects" },
-    { id: "skills" as PortfolioSection, label: "Skills" },
+    { id: "skills" as PortfolioSection, label: "Contributions" },
     { id: "score" as PortfolioSection, label: "Score" },
   ]
 

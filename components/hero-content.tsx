@@ -4,7 +4,7 @@ import type { PortfolioSection } from "@/app/page";
 import type { CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import TechIcons from "@/components/tech-icons";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Lock } from "lucide-react";
 import { PlayingCard } from "@/components/playing-card";
 import type { CardInfo } from "@/lib/cards";
 import { describeHand } from "@/lib/cards";
@@ -17,6 +17,8 @@ interface HeroContentProps {
   totalScore: number;
   onReset: () => void;
   cardSections: PortfolioSection[];
+  scoreUnlocked: boolean;
+  onSelectSection: (section: PortfolioSection) => void;
 }
 
 function AnimatedTitle({
@@ -59,10 +61,19 @@ export default function HeroContent({
   totalScore,
   onReset,
   cardSections,
+  scoreUnlocked,
+  onSelectSection,
 }: HeroContentProps) {
   const handName = describeHand(
     cardSections.map((key) => sectionCards[key]).filter(Boolean) as CardInfo[]
   );
+  const sectionLabel: Record<PortfolioSection, string> = {
+    intro: "About",
+    experience: "Experience",
+    projects: "Projects",
+    skills: "Contributions",
+    score: "Score",
+  };
 
   const performanceText = (() => {
     const texts: Record<string, string> = {
@@ -80,6 +91,24 @@ export default function HeroContent({
 
     return texts[handName];
   })();
+
+  const contributions = [
+    {
+      repo: "beeware/toga",
+      title: "Add support for column resizing in Qt tables",
+      meta: "PR #4189 • Feb 2026",
+      href: "https://github.com/beeware/toga/pull/4189",
+      note: "Shipped a UX-level Qt table enhancement merged into a large cross-platform GUI toolkit.",
+    },
+    {
+      repo: "vectordotdev/vector",
+      title: "Remove tokio-util patch dependency",
+      meta: "PR #24658 • Feb 2026",
+      href: "https://github.com/vectordotdev/vector/pull/24658",
+      note: "Cleaned dependency management in Vector's Rust stack to simplify build/runtime consistency.",
+    },
+  ];
+
   const renderContent = () => {
     switch (activeSection) {
       case "intro":
@@ -146,9 +175,19 @@ export default function HeroContent({
               <details className="border-l-2 border-purple-400 pl-3 md:pl-4 group">
                 <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
                   <div className="space-y-1 md:space-y-2">
-                    <h3 className="text-sm md:text-lg font-medium text-white">
-                      AI Engineer Intern (Master Thesis)
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm md:text-lg font-medium text-white">
+                        AI Engineer Intern (Master Thesis)
+                      </h3>
+                      <a
+                        className="text-purple-200 text-[11px] md:text-xs underline underline-offset-4 hover:text-white transition-colors"
+                        href="https://kth.diva-portal.org/smash/record.jsf?pid=diva2%3A2043849&dswid=6034"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        View thesis
+                      </a>
+                    </div>
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <p className="text-purple-300 text-xs md:text-sm">
                         Volvo Group • Jun 2025 – Nov 2025
@@ -170,8 +209,8 @@ export default function HeroContent({
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  Designing an agentic LLM platform (LangChain + RAG) for 15k
-                  teammates; boosted retrieval accuracy by 25% and baked
+                  Designed an agentic LLM platform (LangChain + RAG) for 15k
+                  users; boosted retrieval accuracy by 25% and baked
                   evaluation checkpoints into delivery.
                 </p>
               </details>
@@ -315,9 +354,11 @@ export default function HeroContent({
                   <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
-                  I’m shipping a social app where people tune their feed with
-                  pluggable recommender strategies. Blends clustering and vector
-                  search (Qdrant) with an API‑first, Expo-powered experience.
+                  Building a social media app where users shape their feed through
+                  customizable algorithms. Combines clustering
+                  and vector search (Qdrant), a Spring Boot API, and a React
+                  Native client to deliver more relevant and controllable
+                  content discovery.
                 </p>
               </details>
               <details className="border-l-2 border-green-400 pl-3 md:pl-4 group">
@@ -350,50 +391,97 @@ export default function HeroContent({
           <>
             <h2
               className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium instrument mb-4 md:mb-6"
-              aria-label="SKILLS"
+              aria-label="CONTRIBUTIONS"
             >
-              <AnimatedTitle text="SKILLS" />
+              <AnimatedTitle text="CONTRIBUTIONS" />
             </h2>
-            <div className="space-y-3 md:space-y-4 max-w-xs md:max-w-2xl">
-              <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
-                  Machine Learning & AI
-                </h3>
-                <p className="text-amber-300 text-xs md:text-sm">
-                  PyTorch, TensorFlow, scikit‑learn, Hugging Face, LangChain,
-                  RAG, NLP, model evaluation
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
-                  Programming Languages
-                </h3>
-                <p className="text-amber-300 text-xs md:text-sm">
-                  Python, C++, JavaScript, TypeScript, SQL
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
-                  Data & Infrastructure
-                </h3>
-                <p className="text-amber-300 text-xs md:text-sm">
-                  Qdrant, Apache Iceberg, Trino, Spark, Apache Knox, Azure,
-                  Docker, Terraform
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm md:text-lg font-medium text-white mb-1 md:mb-2">
-                  Languages
-                </h3>
-                <p className="text-amber-300 text-xs md:text-sm">
-                  French (Fluent), English (TOEFL iBT: 109/120), Arabic (Fluent)
-                </p>
-              </div>
+            <p className="text-xs md:text-sm text-white/70 mb-4 md:mb-6 max-w-xs md:max-w-2xl">
+              Recent open-source pull requests fetched from my public GitHub activity.
+            </p>
+            <div className="space-y-4 md:space-y-5 max-w-xs md:max-w-2xl">
+              {contributions.map((contribution) => (
+                <details
+                  key={`${contribution.repo}-${contribution.href}`}
+                  className="border-l-2 border-amber-400 pl-3 md:pl-4 group"
+                >
+                  <summary className="list-none cursor-pointer flex items-start justify-between gap-3">
+                    <div className="space-y-1 md:space-y-2">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm md:text-lg font-medium text-white">
+                          {contribution.repo}
+                        </h3>
+                        <a
+                          className="text-amber-200 text-[11px] md:text-xs underline underline-offset-4 hover:text-white transition-colors"
+                          href={contribution.href}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {contribution.meta}
+                        </a>
+                      </div>
+                      <p className="text-amber-300 text-xs md:text-sm">
+                        {contribution.title}
+                      </p>
+                    </div>
+                    <ChevronDown className="mt-1 h-4 w-4 text-white/60 transition-transform duration-200 group-open:rotate-180" />
+                  </summary>
+                  <p className="text-white/70 text-xs md:text-sm mt-1 md:mt-2">
+                    {contribution.note}
+                  </p>
+                </details>
+              ))}
             </div>
           </>
         );
 
       case "score":
+        if (!scoreUnlocked) {
+          return (
+            <>
+              <h2
+                className="text-3xl md:text-5xl md:leading-16 tracking-tight font-medium instrument mb-3 md:mb-4"
+                aria-label="SCORE LOCKED"
+              >
+                <AnimatedTitle text="SCORE LOCKED" />
+              </h2>
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-black/25 px-4 py-3 text-white max-w-200 mb-6">
+                <Lock className="mt-1 h-4 w-4 text-amber-300 shrink-0" />
+                <div>
+                  <p className="text-lg leading-tight">Flip all four section cards to unlock Score.</p>
+                  <p className="text-xs text-white/70">Intro, Experience, Projects, and Contributions must all be revealed first.</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2 md:gap-4 items-start max-w-200">
+                {cardSections
+                  .filter((sectionKey) => sectionKey !== "score")
+                  .map((sectionKey) => {
+                    const card = sectionCards[sectionKey];
+                    return (
+                      <button
+                        key={`score-lock-card-${sectionKey}-${card?.id ?? "none"}`}
+                        type="button"
+                        onClick={() => onSelectSection(sectionKey)}
+                        className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-[10px]"
+                        aria-label={`Go to ${sectionLabel[sectionKey]}`}
+                      >
+                        <PlayingCard
+                          card={card}
+                          size="sm"
+                          flipKey={`score-lock-${sectionKey}-${card?.id ?? "none"}`}
+                          label={`${sectionKey} unlock card`}
+                          revealed={Boolean(card)}
+                        />
+                        <p className="text-[10px] uppercase tracking-[0.14em] text-white/70">
+                          {sectionLabel[sectionKey]}
+                        </p>
+                      </button>
+                    );
+                  })}
+              </div>
+            </>
+          );
+        }
+
         return (
           <>
             <h2
