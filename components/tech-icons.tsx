@@ -2,12 +2,12 @@
 
 import type React from "react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+import { BarChart3, Cloud, Workflow } from "lucide-react"
 import {
   SiPython,
-  SiMicrosoftazure,
   SiDocker,
   SiApachespark,
-  SiJava,
+  SiOpenjdk,
   SiSpringboot,
   SiGit,
   SiNextdotjs,
@@ -19,10 +19,8 @@ import {
   SiGitlab,
   SiFastapi,
   SiExpo,
-  SiAzuredevops,
   SiPytorch,
-  SiPowerbi,
-  SiCsharp,
+  SiSharp,
   SiUnity,
   SiAngular,
   SiTerraform,
@@ -32,10 +30,10 @@ import {
 
 const ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   python: SiPython,
-  azure: SiMicrosoftazure,
+  azure: Cloud,
   docker: SiDocker,
   spark: SiApachespark,
-  java: SiJava,
+  java: SiOpenjdk,
   spring: SiSpringboot,
   git: SiGit,
   nextjs: SiNextdotjs,
@@ -48,10 +46,10 @@ const ICONS: Record<string, React.ComponentType<{ size?: number; className?: str
   gitlab: SiGitlab,
   fastapi: SiFastapi,
   expo: SiExpo,
-  azuredevops: SiAzuredevops,
+  azuredevops: Workflow,
   pytorch: SiPytorch,
-  powerbi: SiPowerbi,
-  csharp: SiCsharp,
+  powerbi: BarChart3,
+  csharp: SiSharp,
   unity: SiUnity,
   angular: SiAngular,
   terraform: SiTerraform,

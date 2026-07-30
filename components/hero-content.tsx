@@ -94,18 +94,32 @@ export default function HeroContent({
 
   const contributions = [
     {
+      repo: "tensorflow/tensorflow",
+      title: "Fix XLA strided-slice crash on degenerate dynamic ranges",
+      meta: "Merged PR #112426",
+      href: "https://github.com/tensorflow/tensorflow/pull/112426",
+      note: "Compiler/runtime bugfix in TensorFlow's XLA path with a focused regression case for degenerate dynamic ranges.",
+    },
+    {
+      repo: "DataDog/guarddog",
+      title: "Fix npm alias dependency parsing in npm verify",
+      meta: "Merged PR #684",
+      href: "https://github.com/DataDog/guarddog/pull/684",
+      note: "Security tooling fix that makes npm dependency verification handle alias syntax correctly.",
+    },
+    {
       repo: "beeware/toga",
       title: "Add support for column resizing in Qt tables",
-      meta: "PR #4189 • Feb 2026",
+      meta: "Merged PR #4189",
       href: "https://github.com/beeware/toga/pull/4189",
       note: "Shipped a UX-level Qt table enhancement merged into a large cross-platform GUI toolkit.",
     },
     {
       repo: "vectordotdev/vector",
-      title: "Remove tokio-util patch dependency",
-      meta: "PR #24658 • Feb 2026",
+      title: "fix(deps): remove tokio-util patch dependency",
+      meta: "Merged PR #24658",
       href: "https://github.com/vectordotdev/vector/pull/24658",
-      note: "Cleaned dependency management in Vector's Rust stack to simplify build/runtime consistency.",
+      note: "Cleaned dependency management in Vector's Rust stack to simplify patched build state.",
     },
   ];
 
